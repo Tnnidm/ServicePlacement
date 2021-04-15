@@ -1,3 +1,4 @@
+import argparse
 import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
@@ -5,6 +6,20 @@ from numpy import array as array
 import sys
 import csv
 import gc
+
+def add_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--filedir', type=str, default='../../data/',
+                        help='address of traffic datasets')
+
+    parser.add_argument('--dataset', type=str, default='chengdushi_1001_1010.csv',
+                        help='name of traffic dataset')
+    args = parser.parse_args()
+    return args
+
+args = add_args()
+
 
 #这一部分是提高程序可用的内存上限，防止程序直接卡死
 ###############################################
@@ -28,14 +43,22 @@ min0 = 104.04211    #最西
 max1 = 30.70454     #最北
 min1 = 30.65283     #最南
 
+if "_10" in args.dataset:
+    min_time = 1538336145.0   #最小时间，也就是我们认为1001的0时所在的时间
+    min_date = 1001           #最小日期
+elif "_11" in args.dataset:
+    min_time = 1538336145.0+599*4320     #最小时间，也就是我们认为1001的0时所在的时间
+    min_date = 1101           #最小日期
 
-min_time = 1538336145.0+599*4320     #最小时间，也就是我们认为1001的0时所在的时间
-min_date = 1101           #最小日期
+StartDate = int(args.dataset[11:15])
+# if "10" in args.dataset[13:15] or "20" in args.dataset[13:15]:
+#     StartDate += 1
+Length = int(args.dataset[16:20])-StartDate+1                                        #数据集持续的天数
 
-FileName = '../../data/chengdushi_1120_1130.csv'    #要处理的数据集
-StartDate = 1120                                    #数据集开始时间
-Length = 11                                         #数据集持续的天数
+if "31" in args.dataset:
+    Length = Length+1
 
+FileName = args.filedir+args.dataset    #要处理的数据集
 
 #初始化一个字典，键是日期，值是一个装当天车辆信息的字典
 dict_Car = {}
@@ -103,6 +126,6 @@ gc.enable();
 
 print("begin data store!")
 for i in range(StartDate+1, StartDate+Length):
-    f = open('../preprocessed_data/dict_Car/dict_Car_'+str(i-1)+'.txt','w')   #把字典存在txt文件里
+    f = open('../preprocessed_data/dict_Car/dict_Car_'+str(i-1)+'.txt','w+')   #把字典存在txt文件里
     f.write(str(dict_Car[i]))
     f.close()
