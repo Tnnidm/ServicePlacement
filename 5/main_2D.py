@@ -84,7 +84,7 @@ for file in filelist:
     old_pos = sourcefolder+'/5/'+file
     new_pos = desfolder+'/'+file
     shutil.copyfile(old_pos, new_pos)
-shutil.copyfile(sourcefolder+'/control_group/GreedyPolicy.py', desfolder+'/GreedyPolicy.py')
+shutil.copyfile(sourcefolder+'/5/control_group/GreedyPolicy.py', desfolder+'/GreedyPolicy.py')
 
 para_record = open(path+'/Para.csv', 'w', encoding='utf-8', newline='')
 csv_writer = csv.writer(para_record)
