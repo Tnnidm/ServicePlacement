@@ -1,6 +1,8 @@
 # ignore target folder
 result/
 preprocessed_data/
+.vscode/
+.empty/
   
 # Byte-compiled / optimized / DLL files
 __pycache__/
