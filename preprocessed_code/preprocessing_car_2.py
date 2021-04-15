@@ -10,7 +10,7 @@ from numpy import array as array
 
 for i in range(1,31):   #从1到30号
     print(i)
-    f = open('../preprocessed_data/dict_Car/dict_Car_'+str(1100+i)+'.txt','r')  #读取每一天对应的字典
+    f = open('../preprocessed_data/dict_Car/dict_Car_'+str(1000+i)+'.txt','r')  #读取每一天对应的字典
     a = f.read()
     dict_Car_1001 = eval(a)
     f.close()
@@ -24,7 +24,7 @@ for i in range(1,31):   #从1到30号
         else:
             dict_Car_1001_TimeIndex.update({start_time:[key]})  #否则在字典dict_Car_1001_TimeIndex中加上{起始时隙编号：{车编号}}这个键值对
 
-    f = open('../preprocessed_data/dict_Car/dict_Car_'+str(1100+i)+'_TimeIndex.txt','w')    #保存索引字典
+    f = open('../preprocessed_data/dict_Car/dict_Car_'+str(1000+i)+'_TimeIndex.txt','w')    #保存索引字典
     f.write(str(dict_Car_1001_TimeIndex))
     f.close()
 

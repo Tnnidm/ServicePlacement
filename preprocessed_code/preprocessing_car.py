@@ -44,7 +44,7 @@ max1 = 30.70454     #最北
 min1 = 30.65283     #最南
 
 if "_10" in args.dataset:
-    min_time = 1538336145.0   #最小时间，也就是我们认为1001的0时所在的时间
+    min_time = 1538336145.0-4320   #最小时间，也就是我们认为1001的0时所在的时间
     min_date = 1001           #最小日期
 elif "_11" in args.dataset:
     min_time = 1538336145.0+599*4320     #最小时间，也就是我们认为1001的0时所在的时间
@@ -127,5 +127,5 @@ gc.enable();
 print("begin data store!")
 for i in range(StartDate+1, StartDate+Length):
     f = open('../preprocessed_data/dict_Car/dict_Car_'+str(i-1)+'.txt','w+')   #把字典存在txt文件里
-    f.write(str(dict_Car[i]))
+    f.write(str(dict_Car[i-1]))
     f.close()
