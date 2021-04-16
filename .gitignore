@@ -4,6 +4,7 @@ preprocessed_data/
 .vscode/
 .empty/
 nohup.out 
+*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
