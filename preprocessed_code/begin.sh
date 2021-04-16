@@ -13,4 +13,8 @@ python preprocessing_car.py \
  --dataset 'chengdushi_1020_1031.csv' &
 
 wait
-echo "done!"
+echo "preprocessing_car.py done!"
+
+python preprocessing_car_2.py
+
+echo "preprocessing_car_2.py done!"
