@@ -3,7 +3,8 @@ result/
 preprocessed_data/
 .vscode/
 .empty/
-  
+nohup.out 
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
