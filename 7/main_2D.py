@@ -10,6 +10,7 @@ import gc
 import csv
 import random
 import argparse
+import wandb
 
 # Modules used
 import envirment_PDDPG
@@ -26,14 +27,22 @@ def add_args():
                         help='# the reward coefficient of utilizing')
 
     parser.add_argument('--beta', type=int, default=3,
-                        help='# the reward coefficient of utilizing')
+                        help='# the cost coefficient of opening a BS')
 
-    parser.add_argument('--dataset', type=str, default='chengdushi_1001_1010.csv',
-                        help='name of traffic dataset')
+    parser.add_argument('--omega', type=int, default=5,
+                        help='# the penalty coefficient of disconnection')
+
+    parser.add_argument('--bs_capacity_method', type=str, default='same',
+                        help='# are capacities of BSs same or different?')
+
+    parser.add_argument('--notes', type=str, default='default',
+                        help='# experiment notes')
+
     args = parser.parse_args()
     return args
 
 args = add_args()
+
 
 
 # some parameters
@@ -86,24 +95,28 @@ path = 'result/'+DAY
 if os.path.exists(path) == False:
     os.makedirs(path);
 path = path+'/'+Time
-if os.path.exists(path) == False:
-    os.makedirs(path);
-    os.makedirs(path+'/car_L1_reward_figure')
-    os.makedirs(path+'/AdaptSpeed')
-    os.makedirs(path+'/ConvergenceRate')
-    os.makedirs(path+'/log')
-    os.makedirs(path+'/result_images')
-    os.makedirs(path+'/SystemPerformance')
-    os.makedirs(path+'/code')
+random_str = ''
+if os.path.exists(path) == True:
+    random_str = '_'+str(random.randint(1,999999))
+    path = path+random_str
+
+os.makedirs(path);
+os.makedirs(path+'/car_L1_reward_figure')
+os.makedirs(path+'/AdaptSpeed')
+os.makedirs(path+'/ConvergenceRate')
+os.makedirs(path+'/log')
+os.makedirs(path+'/result_images')
+os.makedirs(path+'/SystemPerformance')
+os.makedirs(path+'/code')
 
 sourcefolder = os.getcwd()
 desfolder = sourcefolder+'/'+path+'/code'
-filelist=GetPyFile(sourcefolder+'/5')
+filelist=GetPyFile(sourcefolder+'/7')
 for file in filelist:
-    old_pos = sourcefolder+'/5/'+file
+    old_pos = sourcefolder+'/7/'+file
     new_pos = desfolder+'/'+file
     shutil.copyfile(old_pos, new_pos)
-shutil.copyfile(sourcefolder+'/5/control_group/GreedyPolicy.py', desfolder+'/GreedyPolicy.py')
+shutil.copyfile(sourcefolder+'/7/control_group/GreedyPolicy.py', desfolder+'/GreedyPolicy.py')
 
 para_record = open(path+'/Para.csv', 'w', encoding='utf-8', newline='')
 csv_writer = csv.writer(para_record)
@@ -129,6 +142,29 @@ csv_loss_w.writerow(['Time', 'Train Times', 'loss_a', 'td_error'])
 '''
 main program
 '''
+logger.info("--------global parameters setting-------")
+global_hyp = dict()
+for k, v in config.__dict__.items():
+    if type(v) in [int, float, str, bool] and not k.startswith('_'):
+        global_hyp.update({k: v})
+for k, v in args.__dict__.items():
+    if type(v) in [int, float, str, bool] and not k.startswith('_'):
+        global_hyp.update({k: v})
+# initialize the wandb.
+if args.bs_capacity_method == "different":
+    group_name = args.model+"-G2"
+    experiment_name = "DeepReserve" + "-capacity" + str(args.bs_capacity_method) + "-" + Time + random_str
+else:
+    group_name = args.model+"-G1"
+    experiment_name = "DeepReserve" + "-alpha" + str(args.alpha) + "-beta" + str(args.beta) + "-omega" + str(args.omega)
+    
+wandb.init(
+    project=group_name,
+    name=experiment_name,
+    config=global_hyp
+)
+
+
 # dqn = dqn.DQN()
 Agent = control_group.GreedyPolicy.Greedy(a_dim)
 
@@ -151,7 +187,7 @@ state_ = np.zeros((1, 10, 1, 1, 1910))
 for Date in range(1008, 1012):
     print('Date = '+str(Date))
 
-    env = envirment_PDDPG.Env(Date, path)
+    env = envirment_PDDPG.Env(Date, path, args)
     a = np.zeros((1,a_dim))
     for i in range(a_dim):
         if np.random.uniform()<0.2:
@@ -245,7 +281,7 @@ for Date in range(1008, 1012):
         loadrate, mixed_loadrate = env.update(a, a_last, i_episode, t+(Date-1001)*SLOTNUM)
         s_ = mixed_loadrate
         disconnect_rate, Avg_Delay, Delay_Outage_Rate = output_PDDPG_2D.Calculate_disconnect_outofdelay(env)
-        r = output_PDDPG_2D.Calculate_Reward_new(a, loadrate, disconnect_rate, Delay_Outage_Rate, env)
+        r = output_PDDPG_2D.Calculate_Reward_new(a, loadrate, disconnect_rate, Delay_Outage_Rate, env, args)
 
 
         # if i_episode%3==0 and t%100==0:
@@ -260,7 +296,9 @@ for Date in range(1008, 1012):
         state_[0,9,0] = s_
         # print(state_)
         line_fig.update(env, r, t)
-        sys_per.update(env, a, r, disconnect_rate, Avg_Delay, Delay_Outage_Rate, t, path)
+        sys_per.update(env, a, r, disconnect_rate, Avg_Delay, Delay_Outage_Rate, t, Date, path)
+
+            
         # conv_rate.store_reward(ddpg, t, i_episode, Date, path)
         # adapt_speed.store_action(t, a)
 
@@ -279,7 +317,13 @@ for Date in range(1008, 1012):
         # if ddpg.pointer > MEMORY_CAPACITY and ddpg.pointer%128==0:
         if ddpg_w.pointer > MEMORY_CAPACITY:
             loss_a, td_error = ddpg_w.learn()
-            csv_loss_w.writerow([t, ddpg_w.learn_time, loss_a, td_error])         
+            csv_loss_w.writerow([t, ddpg_w.learn_time, loss_a, td_error]) 
+            wandb.log({
+                "Train/TimeSlot": t+4320*(Date-1008),
+                "Train/TrainTimes": ddpg_w.learn_time,
+                "Train/Loss_Actor": loss_a,
+                "Train/Loss_Critic": td_error
+            })        
 
         s = s_
         state[0,0:9,0] = state[0,1:10,0]
@@ -336,7 +380,7 @@ for i_episode in range(1):
         loadrate, mixed_loadrate = env.update(a, a_last, i_episode, t+(Date-1001)*SLOTNUM)
         s_ = mixed_loadrate
         disconnect_rate, Avg_Delay, Delay_Outage_Rate = output_PDDPG_2D.Calculate_disconnect_outofdelay(env)
-        r = output_PDDPG_2D.Calculate_Reward_new(a, loadrate, disconnect_rate, Delay_Outage_Rate, env)
+        r = output_PDDPG_2D.Calculate_Reward_new(a, loadrate, disconnect_rate, Delay_Outage_Rate, env, args)
 
 
         # if i_episode%3==0 and t%100==0:
@@ -351,7 +395,7 @@ for i_episode in range(1):
         state_[0,9,0] = s_
         # print(state_)
         line_fig.update(env, r, t)
-        sys_per.update(env, a, r, disconnect_rate, Avg_Delay, Delay_Outage_Rate, t, path)
+        sys_per.update(env, a, r, disconnect_rate, Avg_Delay, Delay_Outage_Rate, t, Date, path)
         # conv_rate.store_reward(ddpg, t, i_episode, Date, path)
         # adapt_speed.store_action(t, a)
 

@@ -1,8 +1,8 @@
 import numpy as np
 from numpy import array as array
 from matplotlib import pyplot as plt
+import random
 import config
-
 
 # some parameters
 L = config.L # the numbers of rows and columns
@@ -124,7 +124,7 @@ class Car:
 
 
 class INDE:
-    def __init__(self, ID, INDEtype, arr):
+    def __init__(self, ID, INDEtype, arr, capacity_method):
         # Hardware attribute
         self.id = ID
         self.INDEtype = INDEtype # INDEtype=1 means it's a car; =0 means it's a INDE
@@ -147,6 +147,10 @@ class INDE:
         self.L1_loadrate = 0
         self.L1_mixed_loadrate = 0
         self.L1_ConnectFailureCount = 0
+        if capacity_method == 'same':
+            self.INDE_CAPACITY = L1_INDE_CAPACITY
+        elif capacity_method == 'different':
+            self.INDE_CAPACITY = random.randint(1,9)
 
         #L2 software attribute
         self.L2_state = 0
@@ -213,14 +217,14 @@ class INDE:
     def L1_connect_Car(self, car_id):
         if self.L1_state == 1:
             self.L1_connecting_car_list.append(car_id)
-            self.L1_loadrate = len(self.L1_connecting_car_list)/L1_INDE_CAPACITY
+            self.L1_loadrate = len(self.L1_connecting_car_list)/self.INDE_CAPACITY
         else:
             print('the L1 INDE is not open!')
 
     def L1_disconnect_Car(self, car_id):
         if self.L1_connecting_car_list:
             self.L1_connecting_car_list.remove(car_id)
-            self.L1_loadrate = len(self.L1_connecting_car_list)/L1_INDE_CAPACITY
+            self.L1_loadrate = len(self.L1_connecting_car_list)/self.INDE_CAPACITY
         else:
             print('no car connect to the INDE now, cannot do the disconnection')
 
@@ -228,7 +232,7 @@ class INDE:
         return(self.L1_loadrate)
 
     def L1_report_mixed_loadrate(self):
-        self.L1_mixed_loadrate = (len(self.L1_connecting_car_list)+self.L1_ConnectFailureCount)/L1_INDE_CAPACITY
+        self.L1_mixed_loadrate = (len(self.L1_connecting_car_list)+self.L1_ConnectFailureCount)/self.INDE_CAPACITY
         return(self.L1_mixed_loadrate)
 
     def L1_calculate_cars_delay(self, dict_existing_car):
@@ -296,7 +300,7 @@ class Env:
     '''
     about the envornment
     '''
-    def __init__(self, Date, path):
+    def __init__(self, Date, path, args):
         '''initializing'''
         self.Date = Date
         f = open('preprocessed_data/dict_Car/dict_Car_'+str(Date)+'.txt','r')
@@ -343,8 +347,9 @@ class Env:
         create object
         '''
         tempid = 0
+        capacity_method = args.bs_capacity_method
         for i in range(len(self.INDE_pos)):
-            self.list_INDE_object.append(INDE(tempid, 0, self.INDE_pos[i,:]))
+            self.list_INDE_object.append(INDE(tempid, 0, self.INDE_pos[i,:], capacity_method))
             tempid += 1
         self.INDE_cell = {}
 
@@ -652,6 +657,12 @@ class Env:
 
     def Get_L1_Car_Num(self):
         return [len(self.dict_existing_car), len(self.list_open_L1_INDE)]
+
+    def Get_L1_Car_Capacity(self):
+        capacity = np.zero(a_dim,)
+        for i in range(a_dim):
+            capacity = self.list_INDE_object[i].INDE_CAPACITY
+        return capacity
 
     def Report_open_close(self):
         open_state = np.zeros((len(self.list_INDE_object),))

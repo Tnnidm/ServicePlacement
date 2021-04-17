@@ -5,6 +5,7 @@ import copy
 import gc
 import math
 import xlwt
+import wandb
 
 
 # Modules used
@@ -71,25 +72,40 @@ def Calculate_Reward(a, uti, disconnect_rate, Delay_Outage_Rate):
     r = 6*reward_utilization*(L1_INDE_CAPACITY/5)-3*cost_open-1000*disconnect_rate-1000*Delay_Outage_Rate
     return r
 
-def Calculate_Reward_new(a, uti, disconnect_rate, Delay_Outage_Rate, env):
+def Calculate_Reward_new(a, uti, disconnect_rate, Delay_Outage_Rate, env, args):
     # calculate INDE cost
     # cost_open = ALPHA*np.sum(a[0:Bt_INDE_num])+BETA*np.sum(a[Bt_INDE_num:])
     cost_open = np.sum(a[0:Bt_INDE_num])
 
     # calculate utilization ratio reward
     reward_utilization = 0
-    for i in range(a_dim):
-        # if uti[i]<=0.6:
-        #     reward_utilization += (1/0.6)*uti[i]
-        # elif uti[i]<=1:
-        #     reward_utilization += 1
-        if uti[i]<=1:
-            reward_utilization += uti[i]
-        else:
-            reward_utilization += (-uti[i]*uti[i]+uti[i]+1)
-    # calculate total r
-    # r = 1000*connect_rate-cost_open-puni_utilization-puni_contentloss
-    r = 6*reward_utilization*(L1_INDE_CAPACITY/5)-3*cost_open-5*disconnect_rate*(env.Print_System_Performance())[0]
+    if args.bs_capacity_method == 'same':
+        for i in range(a_dim):
+            # if uti[i]<=0.6:
+            #     reward_utilization += (1/0.6)*uti[i]
+            # elif uti[i]<=1:
+            #     reward_utilization += 1
+            if uti[i]<=1:
+                reward_utilization += uti[i]
+            else:
+                reward_utilization += (-uti[i]*uti[i]+uti[i]+1)
+        # calculate total r
+        # r = 1000*connect_rate-cost_open-puni_utilization-puni_contentloss
+        r = args.alpha*reward_utilization*(L1_INDE_CAPACITY/5)-args.beta*cost_open-args.omega*disconnect_rate*(env.Print_System_Performance())[0]
+    else:
+        capacity = env.Get_L1_Car_Capacity()
+        for i in range(a_dim):
+            # if uti[i]<=0.6:
+            #     reward_utilization += (1/0.6)*uti[i]
+            # elif uti[i]<=1:
+            #     reward_utilization += 1
+            if uti[i]<=1:
+                reward_utilization += uti[i]*(capacity[i]/5)
+            else:
+                reward_utilization += (-uti[i]*uti[i]+uti[i]+1)*(capacity[i]/5)
+        # calculate total r
+        # r = 1000*connect_rate-cost_open-puni_utilization-puni_contentloss
+        r = args.alpha*reward_utilization-args.beta*cost_open-args.omega*disconnect_rate*(env.Print_System_Performance())[0]
     return r
 
 class SystemPerformance:
@@ -109,7 +125,7 @@ class SystemPerformance:
         for i in range(len(title)):
             self.ws.write(0, i, title[i])
 
-    def update(self, env, a, r, disconnect_rate, Avg_Delay, Delay_Outage_Rate, t, path):
+    def update(self, env, a, r, disconnect_rate, Avg_Delay, Delay_Outage_Rate, t, Date, path):
         
         car_num = (env.Print_System_Performance())[0]
 
@@ -124,14 +140,44 @@ class SystemPerformance:
         if np.sum(a)!= 0:
             ave_open_uti_rate = open_uti_rate_sum/np.sum(a)
 
+        CarNum = int(car_num)
+        OpenBSNum = int(np.sum(a))
+        Reward = int(r)
+        CarConnectRate = float(connect_rate)
+        MeanWorkload = float(ave_open_uti_rate)
+        MeanLatency = float(Avg_Delay)
+        LatencyOutageRate = float(Delay_Outage_Rate)
+    
         self.ws.write(t+1, 0, t)
-        self.ws.write(t+1, 1, int(car_num))
-        self.ws.write(t+1, 2, int(np.sum(a)))
-        self.ws.write(t+1, 3, int(r))
-        self.ws.write(t+1, 4, float(connect_rate))
-        self.ws.write(t+1, 5, float(ave_open_uti_rate))
-        self.ws.write(t+1, 6, float(Avg_Delay))
-        self.ws.write(t+1, 7, float(Delay_Outage_Rate))
+        self.ws.write(t+1, 1, CarNum)
+        self.ws.write(t+1, 2, OpenBSNum)
+        self.ws.write(t+1, 3, Reward)
+        self.ws.write(t+1, 4, CarConnectRate)
+        self.ws.write(t+1, 5, MeanWorkload)
+        self.ws.write(t+1, 6, MeanLatency)
+        self.ws.write(t+1, 7, LatencyOutageRate)
+        if Date != 1012:
+            wandb.log({
+                "Train/TimeSlot": t+4320*(Date-1008),
+                "Train/CarNum": CarNum,
+                "Train/OpenBSNum": OpenBSNum,
+                "Train/Reward": Reward,
+                "Train/CarConnectRate": CarConnectRate,
+                "Train/MeanWorkload": MeanWorkload,
+                "Train/MeanLatency": MeanLatency,
+                "Train/LatencyOutageRate": LatencyOutageRate
+            })
+        else:
+            wandb.log({
+                "Test/TestTimeSlot": t),
+                "Test/CarNum": CarNum,
+                "Test/OpenBSNum": OpenBSNum,
+                "Test/Reward": Reward,
+                "Test/CarConnectRate": CarConnectRate,
+                "Test/MeanWorkload": MeanWorkload,
+                "Test/MeanLatency": MeanLatency,
+                "Test/LatencyOutageRate": LatencyOutageRate
+            })            
         # if t%4319 == 0:
         #     self.store_xsl(path)
 
