@@ -183,163 +183,163 @@ state = np.zeros((1, 10, 1, 1, 1910))
 state_ = np.zeros((1, 10, 1, 1, 1910))
 
 
-for Date in range(1008, 1012):
-    print('Date = '+str(Date))
+# for Date in range(1008, 1012):
+#     print('Date = '+str(Date))
 
-    env = envirment_PDDPG.Env(Date, path, args)
-    a = np.zeros((1,a_dim))
-    for i in range(a_dim):
-        if np.random.uniform()<0.2:
-            a[0,i] = 1
-    a = np.ravel(a)
+#     env = envirment_PDDPG.Env(Date, path, args)
+#     a = np.zeros((1,a_dim))
+#     for i in range(a_dim):
+#         if np.random.uniform()<0.2:
+#             a[0,i] = 1
+#     a = np.ravel(a)
 
-    a_last = np.ravel(np.zeros((1,a_dim)))
-    s = np.ravel(np.zeros((1,s_dim)))
-    s_ = np.ravel(np.zeros((1,s_dim)))
+#     a_last = np.ravel(np.zeros((1,a_dim)))
+#     s = np.ravel(np.zeros((1,s_dim)))
+#     s_ = np.ravel(np.zeros((1,s_dim)))
 
-    loadrate, mixed_loadrate = env.update(a, a_last, 0, 0)
-    s = mixed_loadrate
+#     loadrate, mixed_loadrate = env.update(a, a_last, 0, 0)
+#     s = mixed_loadrate
 
-    s_ = s
-    a_last = a
-    s = np.transpose(s)
-    state_[0,0:9,0] = state_[0,1:10,0]
-    state[0,9,0] = s
-    # print(state)
-    s_ = np.transpose(s_)
+#     s_ = s
+#     a_last = a
+#     s = np.transpose(s)
+#     state_[0,0:9,0] = state_[0,1:10,0]
+#     state[0,9,0] = s
+#     # print(state)
+#     s_ = np.transpose(s_)
 
-    i_episode = 0
+#     i_episode = 0
 
-    sys_per.reset(Date, i_episode, 0)
-    line_fig.reset()
-    # adapt_speed.reset(SLOTNUM, a_dim)
-    # conv_rate.reset(Date, path)
-    # if Date == 1013:
-    #     for target_param, param in zip(ddpg_h.Critic_target.parameters(), ddpg_w.Critic_target.parameters()):
-    #         target_param.data.copy_(param.data)
-    #     for target_param, param in zip(ddpg_h.Actor_target.parameters(), ddpg_w.Actor_target.parameters()):
-    #         target_param.data.copy_(param.data)
-    #     for target_param, param in zip(ddpg_h.Critic_eval.parameters(), ddpg_w.Critic_eval.parameters()):
-    #         target_param.data.copy_(param.data)
-    #     for target_param, param in zip(ddpg_h.Actor_eval.parameters(), ddpg_w.Actor_eval.parameters()):
-    #         target_param.data.copy_(param.data)
+#     sys_per.reset(Date, i_episode, 0)
+#     line_fig.reset()
+#     # adapt_speed.reset(SLOTNUM, a_dim)
+#     # conv_rate.reset(Date, path)
+#     # if Date == 1013:
+#     #     for target_param, param in zip(ddpg_h.Critic_target.parameters(), ddpg_w.Critic_target.parameters()):
+#     #         target_param.data.copy_(param.data)
+#     #     for target_param, param in zip(ddpg_h.Actor_target.parameters(), ddpg_w.Actor_target.parameters()):
+#     #         target_param.data.copy_(param.data)
+#     #     for target_param, param in zip(ddpg_h.Critic_eval.parameters(), ddpg_w.Critic_eval.parameters()):
+#     #         target_param.data.copy_(param.data)
+#     #     for target_param, param in zip(ddpg_h.Actor_eval.parameters(), ddpg_w.Actor_eval.parameters()):
+#     #         target_param.data.copy_(param.data)
 
-    for t in range(1, SLOTNUM):
-        # if t%10 == 0:
-        #     print(t)
-        # csv_writer.writerow([i_episode, t])
-        # csv_writer.writerow(s[0].tolist())
-
-
-        # if i_episode == 0:
-        # if Date == 1008:
-        #     # print(s)
-        #     aa = Agent.choose_action(env, s, a_last)
-        #     a_t = copy.deepcopy(aa)
-        #     a = aa[0,:]                     
-        # else:
-        #     if Date<=1007 or (Date-1007)%7>=6:
-        #         aa = ddpg_h.choose_action_2(state, EPSILON)
-        #     else:
-        #         aa = ddpg_w.choose_action_2(state, EPSILON)
-        #     a_t = copy.deepcopy(aa).numpy()
-        #     a = aa[0,:1910].numpy() 
-
-        if Date == 1008:
-            # print(s)
-            aa = Agent.choose_action(env, s, a_last)
-            a_t = copy.deepcopy(aa)
-            a = aa[0,:]                     
-        else:
-            aa = ddpg_w.choose_action_2(state, env, a_last, EPSILON)
-            a_t = copy.deepcopy(aa).numpy()
-            a = aa[0,:1910].numpy() 
+#     for t in range(1, SLOTNUM):
+#         # if t%10 == 0:
+#         #     print(t)
+#         # csv_writer.writerow([i_episode, t])
+#         # csv_writer.writerow(s[0].tolist())
 
 
-        for i in range(a_dim):
-            if a[i] >= 0.5:
-                a[i] = 1
-            else:
-                a[i] = 0
+#         # if i_episode == 0:
+#         # if Date == 1008:
+#         #     # print(s)
+#         #     aa = Agent.choose_action(env, s, a_last)
+#         #     a_t = copy.deepcopy(aa)
+#         #     a = aa[0,:]                     
+#         # else:
+#         #     if Date<=1007 or (Date-1007)%7>=6:
+#         #         aa = ddpg_h.choose_action_2(state, EPSILON)
+#         #     else:
+#         #         aa = ddpg_w.choose_action_2(state, EPSILON)
+#         #     a_t = copy.deepcopy(aa).numpy()
+#         #     a = aa[0,:1910].numpy() 
 
-        # csv_writer.writerow(a.tolist())
+#         if Date == 1008:
+#             # print(s)
+#             aa = Agent.choose_action(env, s, a_last)
+#             a_t = copy.deepcopy(aa)
+#             a = aa[0,:]                     
+#         else:
+#             aa = ddpg_w.choose_action_2(state, env, a_last, EPSILON)
+#             a_t = copy.deepcopy(aa).numpy()
+#             a = aa[0,:1910].numpy() 
+
+
+#         for i in range(a_dim):
+#             if a[i] >= 0.5:
+#                 a[i] = 1
+#             else:
+#                 a[i] = 0
+
+#         # csv_writer.writerow(a.tolist())
 
         
-        # open_state = env.Report_open_close()
-        # for i in range(a_dim):
-        #     if a_last[i]!=open_state[i]:
-        #         print('1_ERROR!!!!!')
-        #         break
+#         # open_state = env.Report_open_close()
+#         # for i in range(a_dim):
+#         #     if a_last[i]!=open_state[i]:
+#         #         print('1_ERROR!!!!!')
+#         #         break
 
-        # if i_episode%3==0 and t%100==0:
-        #     result_list = adapt_speed.Calculate_AdaptSpeed(env, a_last, i_episode, t, Date, SLOTNUM)
-        #     reward_list = result_list[0] 
-        #     disconnect_rate_list = result_list[1]
-        #     Delay_Outage_Rate_list = result_list[2]
+#         # if i_episode%3==0 and t%100==0:
+#         #     result_list = adapt_speed.Calculate_AdaptSpeed(env, a_last, i_episode, t, Date, SLOTNUM)
+#         #     reward_list = result_list[0] 
+#         #     disconnect_rate_list = result_list[1]
+#         #     Delay_Outage_Rate_list = result_list[2]
 
-        loadrate, mixed_loadrate = env.update(a, a_last, i_episode, t+(Date-1001)*SLOTNUM)
-        s_ = mixed_loadrate
-        disconnect_rate, Avg_Delay, Delay_Outage_Rate = output_PDDPG_2D.Calculate_disconnect_outofdelay(env)
-        r = output_PDDPG_2D.Calculate_Reward_new(a, loadrate, disconnect_rate, Delay_Outage_Rate, env, args)
+#         loadrate, mixed_loadrate = env.update(a, a_last, i_episode, t+(Date-1001)*SLOTNUM)
+#         s_ = mixed_loadrate
+#         disconnect_rate, Avg_Delay, Delay_Outage_Rate = output_PDDPG_2D.Calculate_disconnect_outofdelay(env)
+#         r = output_PDDPG_2D.Calculate_Reward_new(a, loadrate, disconnect_rate, Delay_Outage_Rate, env, args)
 
 
-        # if i_episode%3==0 and t%100==0:
-        #     reward_list.append(float(r))
-        #     disconnect_rate_list.append(float(disconnect_rate))
-        #     Delay_Outage_Rate_list.append(float(Delay_Outage_Rate))
-        #     sys_per.update_AdaptSpeed([reward_list, disconnect_rate_list, Delay_Outage_Rate_list], t)
+#         # if i_episode%3==0 and t%100==0:
+#         #     reward_list.append(float(r))
+#         #     disconnect_rate_list.append(float(disconnect_rate))
+#         #     Delay_Outage_Rate_list.append(float(Delay_Outage_Rate))
+#         #     sys_per.update_AdaptSpeed([reward_list, disconnect_rate_list, Delay_Outage_Rate_list], t)
     
-        s_ = np.transpose(s_)
+#         s_ = np.transpose(s_)
 
-        state_[0,0:9,0] = state_[0,1:10,0]
-        state_[0,9,0] = s_
-        # print(state_)
-        line_fig.update(env, r, t)
-        sys_per.update(env, a, r, disconnect_rate, Avg_Delay, Delay_Outage_Rate, t, Date, path)
+#         state_[0,0:9,0] = state_[0,1:10,0]
+#         state_[0,9,0] = s_
+#         # print(state_)
+#         line_fig.update(env, r, t)
+#         sys_per.update(env, a, r, disconnect_rate, Avg_Delay, Delay_Outage_Rate, t, Date, path)
 
             
-        # conv_rate.store_reward(ddpg, t, i_episode, Date, path)
-        # adapt_speed.store_action(t, a)
+#         # conv_rate.store_reward(ddpg, t, i_episode, Date, path)
+#         # adapt_speed.store_action(t, a)
 
-        r = np.array([r])
-        # if Date<=1007 or (Date-1007)%7>=6:
-        #     if t>10:
-        #         ddpg_h.store_transition(state, a_t, r, state_)
-        #     # if ddpg.pointer > MEMORY_CAPACITY and ddpg.pointer%128==0:
-        #     if ddpg_h.pointer > MEMORY_CAPACITY:
-        #         loss_a, td_error = ddpg_h.learn()
-        #         csv_loss_h.writerow([t, ddpg_h.learn_time, loss_a, td_error])
+#         r = np.array([r])
+#         # if Date<=1007 or (Date-1007)%7>=6:
+#         #     if t>10:
+#         #         ddpg_h.store_transition(state, a_t, r, state_)
+#         #     # if ddpg.pointer > MEMORY_CAPACITY and ddpg.pointer%128==0:
+#         #     if ddpg_h.pointer > MEMORY_CAPACITY:
+#         #         loss_a, td_error = ddpg_h.learn()
+#         #         csv_loss_h.writerow([t, ddpg_h.learn_time, loss_a, td_error])
 
-        # else:
-        if t>10:
-            ddpg_w.store_transition(state, a_t, r, state_)
-        # if ddpg.pointer > MEMORY_CAPACITY and ddpg.pointer%128==0:
-        if ddpg_w.pointer > MEMORY_CAPACITY:
-            loss_a, td_error = ddpg_w.learn()
-            csv_loss_w.writerow([t, ddpg_w.learn_time, loss_a, td_error]) 
-            wandb.log({
-                "Train/TimeSlot": t+4320*(Date-1008),
-                "Train/TrainTimes": ddpg_w.learn_time,
-                "Train/Loss_Actor": loss_a,
-                "Train/Loss_Critic": td_error
-            })        
+#         # else:
+#         if t>10:
+#             ddpg_w.store_transition(state, a_t, r, state_)
+#         # if ddpg.pointer > MEMORY_CAPACITY and ddpg.pointer%128==0:
+#         if ddpg_w.pointer > MEMORY_CAPACITY:
+#             loss_a, td_error = ddpg_w.learn()
+#             csv_loss_w.writerow([t, ddpg_w.learn_time, loss_a, td_error]) 
+#             wandb.log({
+#                 "Train/TimeSlot": t+4320*(Date-1008),
+#                 "Train/TrainTimes": ddpg_w.learn_time,
+#                 "Train/Loss_Actor": loss_a,
+#                 "Train/Loss_Critic": td_error
+#             })        
 
-        s = s_
-        state[0,0:9,0] = state[0,1:10,0]
-        state[0,9,0] = s
-        # print(state)
-        # ep_r += r
-        a_last = a
+#         s = s_
+#         state[0,0:9,0] = state[0,1:10,0]
+#         state[0,9,0] = s
+#         # print(state)
+#         # ep_r += r
+#         a_last = a
 
-    # var = var*0.8
-    # draw number of car and INDE,draw reward
-    # if i_episode == 0:
-    #     continue
-    line_fig.Draw_Lines(Date, i_episode, path)
-    sys_per.store_xsl(path)
-    # EPSILON = EPSILON*0.8 
-    del env
-    gc.collect()
+#     # var = var*0.8
+#     # draw number of car and INDE,draw reward
+#     # if i_episode == 0:
+#     #     continue
+#     line_fig.Draw_Lines(Date, i_episode, path)
+#     sys_per.store_xsl(path)
+#     # EPSILON = EPSILON*0.8 
+#     del env
+#     gc.collect()
 
 
 # conv_rate.Figure_ConvergenceRate(path)
@@ -349,13 +349,13 @@ para_record.close()
 # ddpg_w.save_model(path)
 
 Date = 1012
-env = envirment_PDDPG.Env(Date, path)
+env = envirment_PDDPG.Env(Date, path, args)
 a_last = np.ravel(np.zeros((1,a_dim)))
 
 
 for i_episode in range(1):
 
-    print('i_episode = '+str(i_episode))
+    # print('i_episode = '+str(i_episode))
     sys_per.reset(Date, i_episode, 1)
     line_fig.reset()
     # adapt_speed.reset(SLOTNUM, a_dim)
