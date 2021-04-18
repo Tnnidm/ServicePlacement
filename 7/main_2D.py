@@ -155,7 +155,7 @@ if args.bs_capacity_method == "different":
     experiment_name = "DeepReserve" + "-capacity" + str(args.bs_capacity_method) + "-" + Time + random_str
 else:
     group_name = "DeepReserve-G1"
-    experiment_name = "DeepReserve" + "-alpha" + str(args.alpha) + "-beta" + str(args.beta) + "-omega" + str(args.omega)
+    experiment_name = "DeepReserve" + "-alpha" + str(args.alpha) + "-beta" + str(args.beta) + "-omega" + str(args.omega) + "-" + Time + random_str
     
 wandb.init(
     project=group_name,
