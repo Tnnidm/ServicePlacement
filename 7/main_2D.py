@@ -142,7 +142,6 @@ csv_loss_w.writerow(['Time', 'Train Times', 'loss_a', 'td_error'])
 '''
 main program
 '''
-logger.info("--------global parameters setting-------")
 global_hyp = dict()
 for k, v in config.__dict__.items():
     if type(v) in [int, float, str, bool] and not k.startswith('_'):
@@ -152,10 +151,10 @@ for k, v in args.__dict__.items():
         global_hyp.update({k: v})
 # initialize the wandb.
 if args.bs_capacity_method == "different":
-    group_name = args.model+"-G2"
+    group_name = "DeepReserve-G2"
     experiment_name = "DeepReserve" + "-capacity" + str(args.bs_capacity_method) + "-" + Time + random_str
 else:
-    group_name = args.model+"-G1"
+    group_name = "DeepReserve-G1"
     experiment_name = "DeepReserve" + "-alpha" + str(args.alpha) + "-beta" + str(args.beta) + "-omega" + str(args.omega)
     
 wandb.init(

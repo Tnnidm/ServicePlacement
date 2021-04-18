@@ -169,7 +169,7 @@ class SystemPerformance:
             })
         else:
             wandb.log({
-                "Test/TestTimeSlot": t),
+                "Test/TestTimeSlot": t,
                 "Test/CarNum": CarNum,
                 "Test/OpenBSNum": OpenBSNum,
                 "Test/Reward": Reward,
