@@ -24,26 +24,7 @@ for key in list(dict_Car.keys()):
 plt.figure(figsize = (1.8,1.4),dpi = 300)
 sbn.set()
 
-heatmap = sbn.heatmap(np.sum(hp[360:460, :, :], axis = 0), cbar = False, xticklabels = False, yticklabels = False)
-plt.savefig('6.png', dpi = 1000, vmin=0, vmax=100)
-plt.clf()
-
-heatmap = sbn.heatmap(np.sum(hp[900:1000, :, :], axis = 0), cbar = False, xticklabels = False, yticklabels = False)
-plt.savefig('9.png', dpi = 1000, vmin=0, vmax=100)
-plt.clf()
-
-heatmap = sbn.heatmap(np.sum(hp[1440:1540, :, :], axis = 0), cbar = False, xticklabels = False, yticklabels = False)
-plt.savefig('12.png', dpi = 1000, vmin=0, vmax=100)
-plt.clf()
-
-heatmap = sbn.heatmap(np.sum(hp[1980:2080, :, :], axis = 0), cbar = False, xticklabels = False, yticklabels = False)
-plt.savefig('15.png', dpi = 1000, vmin=0, vmax=100)
-plt.clf()
-
-heatmap = sbn.heatmap(np.sum(hp[2520:2620, :, :], axis = 0), cbar = False, xticklabels = False, yticklabels = False)
-plt.savefig('18.png', dpi = 1000, vmin=0, vmax=100)
-plt.clf()
-
-heatmap = sbn.heatmap(np.sum(hp[3060:3160, :, :], axis = 0), cbar = False, xticklabels = False, yticklabels = False)
-plt.savefig('21.png', dpi = 1000, vmin=0, vmax=100)
-plt.clf()
+for i in range(0,int(4320/9)):
+    heatmap = sbn.heatmap(np.sum(hp[9*i:9*(i+1), 100:200, 50:150], axis = 0), cbar = False, xticklabels = False, yticklabels = False, vmin=0, vmax=10, cmap='RdYlGn_r')
+    plt.savefig('heatmap/'+str(int(3*i/60)).zfill(2)+str(int((3*i)%60)).zfill(2)+".png", dpi = 1000)
+    plt.clf()
