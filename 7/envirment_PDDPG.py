@@ -659,9 +659,9 @@ class Env:
         return [len(self.dict_existing_car), len(self.list_open_L1_INDE)]
 
     def Get_L1_Car_Capacity(self):
-        capacity = np.zero(a_dim,)
+        capacity = np.zeros(a_dim,)
         for i in range(a_dim):
-            capacity = self.list_INDE_object[i].INDE_CAPACITY
+            capacity[i] = self.list_INDE_object[i].INDE_CAPACITY
         return capacity
 
     def Report_open_close(self):
