@@ -25,6 +25,6 @@ plt.figure(figsize = (1.8,1.4),dpi = 300)
 sbn.set()
 
 for i in range(0,int(4320/9)):
-    heatmap = sbn.heatmap(np.sum(hp[9*i:9*(i+1), 100:200, 50:150], axis = 0), cbar = False, xticklabels = False, yticklabels = False, vmin=0, vmax=10, cmap='RdYlGn_r')
+    heatmap = sbn.heatmap(np.sum(hp[9*i:9*(i+1), 100:200, 50:150], axis = 0), xticklabels = False, yticklabels = False, vmin=0, vmax=10, cmap='RdYlGn_r')
     plt.savefig('heatmap/'+str(int(3*i/60)).zfill(2)+str(int((3*i)%60)).zfill(2)+".png", dpi = 1000)
     plt.clf()
