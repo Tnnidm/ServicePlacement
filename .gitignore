@@ -8,6 +8,9 @@ nohup.out
 *.sh
 wandb/
 heatmap/
+*.npy
+*.tar
+*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
