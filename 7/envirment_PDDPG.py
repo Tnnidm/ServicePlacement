@@ -3,6 +3,7 @@ from numpy import array as array
 from matplotlib import pyplot as plt
 import random
 import config
+import copy
 
 # some parameters
 L = config.L # the numbers of rows and columns
@@ -663,6 +664,12 @@ class Env:
         for i in range(a_dim):
             capacity[i] = self.list_INDE_object[i].INDE_CAPACITY
         return capacity
+
+    def Translate_Loadrate(self, loadrate):
+        loadrate_new = copy.deepcopy(loadrate)
+        for i in range(a_dim):
+            loadrate_new[i,0] = loadrate[i,0]*self.list_INDE_object[i].INDE_CAPACITY/5
+        return loadrate_new
 
     def Report_open_close(self):
         open_state = np.zeros((len(self.list_INDE_object),))

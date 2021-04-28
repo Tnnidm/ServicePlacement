@@ -225,6 +225,8 @@ for Date in range(1008, 1012):
     #         target_param.data.copy_(param.data)
 
     for t in range(1, SLOTNUM):
+        # if Date == 1008:
+        #     continue
         # if t%10 == 0:
         #     print(t)
         # csv_writer.writerow([i_episode, t])
@@ -278,7 +280,7 @@ for Date in range(1008, 1012):
         #     Delay_Outage_Rate_list = result_list[2]
 
         loadrate, mixed_loadrate = env.update(a, a_last, i_episode, t+(Date-1001)*SLOTNUM)
-        s_ = mixed_loadrate
+        s_ = env.Translate_Loadrate(mixed_loadrate)
         disconnect_rate, Avg_Delay, Delay_Outage_Rate = output_PDDPG_2D.Calculate_disconnect_outofdelay(env)
         r = output_PDDPG_2D.Calculate_Reward_new(a, loadrate, disconnect_rate, Delay_Outage_Rate, env, args)
 
@@ -377,7 +379,7 @@ for i_episode in range(1):
 
 
         loadrate, mixed_loadrate = env.update(a, a_last, i_episode, t+(Date-1001)*SLOTNUM)
-        s_ = mixed_loadrate
+        s_ = env.Translate_Loadrate(mixed_loadrate)
         disconnect_rate, Avg_Delay, Delay_Outage_Rate = output_PDDPG_2D.Calculate_disconnect_outofdelay(env)
         r = output_PDDPG_2D.Calculate_Reward_new(a, loadrate, disconnect_rate, Delay_Outage_Rate, env, args)
 
