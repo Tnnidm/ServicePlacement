@@ -23,7 +23,7 @@ color = [(0.3098, 0.5059, 0.74120), (0.6078, 0.7333, 0.3490), (0.7490, 0.3137, 0
 FontSize1 = 18 # 小的字体
 FontSize2 = 26 # 大的字体
 
-NO = 5 # 第几个图
+NO = 6 # 第几个图
 if NO ==  1:
     Y_Label = 'Average system utility'
     Y = [712.6650, 220.5163, 232.7826, 524.5636]
@@ -60,29 +60,29 @@ elif NO == 4:
     fig = plt.figure(figsize=(2*5.2*(1/(1-x)),2*5.2/2.541), dpi = 100)
 
 elif NO ==  5:
-    X = 0.9 # 起始坐标
-    XX = 1.2 # 间隔
-    w = 0.6 # 柱子宽度
+    X = 0.6 # 起始坐标
+    XX = 0.9 # 间隔
+    w = 0.5 # 柱子宽度
     X_limid = (0, 3)
     Y_Label = 'Average system utility'
-    Y = [712.6650, 718.8803]
-    legend_list = ['DeepReserve','VP']
-    Y_limid = (0, 900)
+    Y = [718.8803, 502.6686733, 712.6650]
+    legend_list = ['MDR', 'ODR', 'OSR']
+    Y_limid = (0, 930)
 
-    lo = 9 #legend位置
+    lo = 1 #legend位置
     nco = 2 #legend分成几列
     fig = plt.figure(figsize=(5.2*(1/(1-x)),5.2), dpi = 100)
 
 elif NO ==  6:
-    X = 0.9 # 起始坐标
-    XX = 1.2 # 间隔
-    w = 0.6 # 柱子宽度
+    X = 0.6 # 起始坐标
+    XX = 0.9 # 间隔
+    w = 0.5 # 柱子宽度
     X_limid = (0, 3)
     Y_Label = 'Average resource'+'\n'+'utilization'
-    Y = [0.6600, 0.6579]
-    legend_list = ['DeepReserve','VP']
-    Y_limid = (0, 0.8)
-    lo = 9 #legend位置
+    Y = [0.6579, 0.577685, 0.66]
+    legend_list = ['MDR', 'ODR', 'OSR']
+    Y_limid = (0, 0.85)
+    lo = 1 #legend位置
     nco = 2 #legend分成几列
     fig = plt.figure(figsize=(5.2*(1/(1-x)),5.2), dpi = 100)
 
